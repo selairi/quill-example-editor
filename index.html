@@ -33,7 +33,6 @@
       flex: 1;
       overflow-y: auto;
       width: 100%;
-      font-family: "Times";
     }
     .boton {
       background: none;
@@ -47,28 +46,9 @@
     }
 
 
-    /* Set dropdown font-families */
-    #toolbar-container .ql-font span[data-label="Times"]::before {
-      font-family: "Times";
+    .ql-font-sans {
+      font-family: Helvetica, Arial, sans-serif;
     }
-    #toolbar-container .ql-font span[data-label="Helvetica"]::before {
-      font-family: "Helvetica";
-    }
-    #toolbar-container .ql-font span[data-label="Courier"]::before {
-      font-family: "Courier";
-    }
-
-    /* Set content font-families */
-    .ql-font-Helvetica {
-      font-family: "Helvetica";
-    }
-    .ql-font-Courier {
-      font-family: "Courier";
-    }
-    .ql-font-Times {
-      font-family: "Times";
-    }
-
   </style>
 
 
@@ -91,9 +71,6 @@
     <button onclick="redo()"><img height='12px' src='mono-redo.svg'></img></button>
     <span class="ql-formats">
       <select class="ql-font">
-        <option value="Times" selected>Times</option>
-        <option value="Helvetica">Helvetica</option>
-        <option value="Courier">Courier</option>
       </select>
       <select class="ql-size"></select>
     </span>
@@ -159,11 +136,6 @@
 
 
 <script>
-  // Add fonts
-  var Font = Quill.import('formats/font');
-  Font.whitelist = ["Helvetica", "Times", "Courier"];
-  Quill.register(Font, true);
-
   var quill = new Quill('#editor-container', {
     modules: {
       formula: true,
@@ -246,7 +218,7 @@
     //var text = quill.root.innerHTML;
     var ps = quill.root.getElementsByTagName("p");
     for(var i = 0; i < ps.length; i++) {
-        ps[i].classList.add("ql-font-Times");
+        ps[i].classList.add("ql-font-sans");
     }
     doc.html(
         quill.root, {
