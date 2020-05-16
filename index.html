@@ -148,7 +148,7 @@
   function save() {
     //var text = document.getElementById("editor-container").innerHTML;
     var fileNameAux = prompt("Please enter file name", fileName);
-    sessionStorage.setItem("filename") = filename;
+    sessionStorage.setItem("filename", filename);
     if(fileNameAux != null) {
         fileName = fileNameAux;
         var text = quill.root.innerHTML;
@@ -244,7 +244,7 @@
   }
 
   function saveSession() {
-    sessionStorage.setItem("text") = quill.root.innerHTML;
+    sessionStorage.setItem("text", quill.root.innerHTML);
   }
 
   function saveSessionTimer(delta, oldDelta, source) {
