@@ -1,0 +1,13 @@
+{
+  "name": "Quill Editor",
+  "short_name": "Quill Editor",
+  "icons": [{
+    "src": "doc-icon.svg",
+      "sizes": "128x128",
+      "type": "image/svg"
+    }],
+  "start_url": "index.html",
+  "display": "standalone",
+  "background_color": "#3E4EB8",
+  "theme_color": "#2F3BA2"
+}
