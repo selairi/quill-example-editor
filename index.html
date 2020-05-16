@@ -34,6 +34,16 @@
       overflow-y: auto;
       width: 100%;
     }
+    .boton {
+      background: none;
+      border: none;
+      cursor: pointer;
+      display: inline-block;
+      float: left;
+      height: 24px;
+      padding: 3px 5px;
+      width: 28px;
+    }
   </style>
 
 
@@ -41,7 +51,11 @@
 <body>
 
 <div id="standalone-container">
+  <div id="menu" style="display: none;">
+    <button class="boton" onclick="showToolBar()">☰</button>
+  </div>
   <div id="toolbar-container">
+    <button onclick="hideToolBar()">☰</button>
     <input type="file" id="file-input" style="display: none;" />
     <button onclick="openFile()"><img src='Anonymous-Folder-2-icon.svg'></button>
     <button onclick="save()"><img src='Anonymous-Floppy-disk-icon.svg'></img></button>
@@ -128,10 +142,13 @@
 
 
   var fileName = "untitled.html";
+  var saveSessionTimeout = null;
+
 
   function save() {
     //var text = document.getElementById("editor-container").innerHTML;
     var fileNameAux = prompt("Please enter file name", fileName);
+    sessionStorage.setItem("filename") = filename;
     if(fileNameAux != null) {
         fileName = fileNameAux;
         var text = quill.root.innerHTML;
@@ -203,6 +220,39 @@
   function redo() {
     quill.history.redo();
   }
+
+  function showToolBar() {
+    document.getElementById("toolbar-container").style.display = "flex";
+    document.getElementById("menu").style.display = "none";
+  }
+
+  function hideToolBar() {
+    document.getElementById("toolbar-container").style.display = "none";
+    document.getElementById("menu").style.display = "flex";
+  }
+
+  // Enable spell check
+  quill.root.lang = navigator.language || navigator.userLanguage;
+
+  // Reload session
+  if(sessionStorage.getItem("filename")) {
+    filename = sessionStorage.getItem("filename");
+  }
+  if(sessionStorage.getItem("text")) {
+    quill.root.innerHTML = sessionStorage.getItem("text");
+    alert("Sesión recuperada");
+  }
+
+  function saveSession() {
+    sessionStorage.setItem("text") = quill.root.innerHTML;
+  }
+
+  function saveSessionTimer(delta, oldDelta, source) {
+    if(clearTimeout != null) clearTimeout(clearTimeout);
+    saveSessionTimeout = setTimeout(saveSession, 2000);
+  }
+
+  quill.on('text-change', saveSessionTimer);
 
 </script>
 
