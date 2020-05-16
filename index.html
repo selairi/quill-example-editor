@@ -238,6 +238,30 @@
   // Enable spell check
   quill.root.lang = navigator.language || navigator.userLanguage;
 
+  // Edit formulas
+
+  function editFormula() {
+    var attribute = this.getAttribute("data-value");
+    if(attribute) {
+        var formula = prompt("", attribute);
+        if(formula) {
+            this.setAttribute("data-value", formula);
+                katex.render(formula, this, {
+                throwOnError: false
+            });
+        }
+    }
+  }
+
+  function updateFormulaEditor() {
+      var elements = document.getElementsByClassName("ql-formula");
+
+      for (var i = 0; i < elements.length; i++) {
+          elements[i].removeEventListener('click', editFormula);
+          elements[i].addEventListener('click', editFormula);
+      }
+  }
+
   // Reload session
   if(sessionStorage.getItem("filename")) {
     filename = sessionStorage.getItem("filename");
@@ -247,13 +271,16 @@
     alert("Sesión recuperada");
   }
 
+  // Save actual session
+
   function saveSession() {
     sessionStorage.setItem("text", quill.root.innerHTML);
+    updateFormulaEditor();
   }
 
   function saveSessionTimer(delta, oldDelta, source) {
     if(saveSessionTimeout != null) clearTimeout(saveSessionTimeout);
-    saveSessionTimeout = setTimeout(saveSession, 2000);
+    saveSessionTimeout = setTimeout(saveSession, 10000);
   }
 
   quill.on('text-change', saveSessionTimer);
