@@ -33,6 +33,7 @@
       flex: 1;
       overflow-y: auto;
       width: 100%;
+      font-family: "Times";
     }
     .boton {
       background: none;
@@ -44,6 +45,30 @@
       padding: 3px 5px;
       width: 28px;
     }
+
+
+    /* Set dropdown font-families */
+    #toolbar-container .ql-font span[data-label="Times"]::before {
+      font-family: "Times";
+    }
+    #toolbar-container .ql-font span[data-label="Helvetica"]::before {
+      font-family: "Helvetica";
+    }
+    #toolbar-container .ql-font span[data-label="Courier"]::before {
+      font-family: "Courier";
+    }
+
+    /* Set content font-families */
+    .ql-font-Helvetica {
+      font-family: "Helvetica";
+    }
+    .ql-font-Courier {
+      font-family: "Courier";
+    }
+    .ql-font-Times {
+      font-family: "Times";
+    }
+
   </style>
 
 
@@ -57,6 +82,7 @@
   <div id="toolbar-container">
     <button onclick="hideToolBar()">☰</button>
     <input type="file" id="file-input" style="display: none;" />
+    <button onclick="newDoc()"><img height='12px' src='doc-icon.svg'></button>
     <button onclick="openFile()"><img src='Anonymous-Folder-2-icon.svg'></button>
     <button onclick="save()"><img src='Anonymous-Floppy-disk-icon.svg'></img></button>
     <button onclick="print()"><img src='Anonymous-Printer-icon.svg'></img></button>
@@ -64,7 +90,11 @@
     <button onclick="undo()"><img height='12px' src='mono-undo.svg'></img></button>
     <button onclick="redo()"><img height='12px' src='mono-redo.svg'></img></button>
     <span class="ql-formats">
-      <select class="ql-font"></select>
+      <select class="ql-font">
+        <option value="Times" selected>Times</option>
+        <option value="Helvetica">Helvetica</option>
+        <option value="Courier">Courier</option>
+      </select>
       <select class="ql-size"></select>
     </span>
     <span class="ql-formats">
@@ -123,11 +153,17 @@
 <script src="quill.min.js"></script>
 <script src="image-resize.min.js"></script>
 <script src="FileSaver.js"></script>
+<script src="html2canvas.js"></script>
 <script src="jspdf.min.js"></script>
 
 
 
 <script>
+  // Add fonts
+  var Font = Quill.import('formats/font');
+  Font.whitelist = ["Helvetica", "Times", "Courier"];
+  Quill.register(Font, true);
+
   var quill = new Quill('#editor-container', {
     modules: {
       formula: true,
@@ -147,6 +183,14 @@
 
   var fileName = "untitled.html";
   var saveSessionTimeout = null;
+
+  function newDoc() {
+    var ok = confirm("The file will be erased");
+    if(ok) {
+        fileName = "untitled.html";
+        quill.root.innerHTML ="";
+    }
+  }
 
 
   function save() {
@@ -196,23 +240,21 @@
 
 
   function pdf() {
-    var doc = new jsPDF();
-    var elementHandler = {
-        '#ignorePDF': function (element, renderer) {
-        return true;
+    var doc = new jsPDF('p','pt','a4');
+    doc.setFont("Times");
+    doc.setFontType("normal");
+    //var text = quill.root.innerHTML;
+    var ps = quill.root.getElementsByTagName("p");
+    for(var i = 0; i < ps.length; i++) {
+        ps[i].classList.add("ql-font-Times");
+    }
+    doc.html(
+        quill.root, {
+            callback: function (doc) {
+              doc.save();
+            }
         }
-    };
-    var text = quill.root.innerHTML;
-    var source = window.document.getElementsByTagName("body")[0];
-        doc.fromHTML(
-        text,
-        15,
-        15,
-        {
-          'width': 180,'elementHandlers': elementHandler
-    });
-
-    doc.output("dataurlnewwindow");
+    );
   }
 
 
@@ -226,13 +268,13 @@
   }
 
   function showToolBar() {
-    document.getElementById("toolbar-container").style.display = "flex";
+    document.getElementById("toolbar-container").style.display = document.getElementById("menu").style.display;
     document.getElementById("menu").style.display = "none";
   }
 
   function hideToolBar() {
+    document.getElementById("menu").style.display = document.getElementById("toolbar-container").style.display;
     document.getElementById("toolbar-container").style.display = "none";
-    document.getElementById("menu").style.display = "flex";
   }
 
   // Enable spell check
@@ -265,9 +307,14 @@
   // Reload session
   if(sessionStorage.getItem("filename")) {
     filename = sessionStorage.getItem("filename");
+  } else if(localStorage.getItem("filename")) {
+    filename = localStorage.getItem("filename");
   }
   if(sessionStorage.getItem("text")) {
     quill.root.innerHTML = sessionStorage.getItem("text");
+    alert("Sesión recuperada");
+  } else  if(localStorage.getItem("text")) {
+    quill.root.innerHTML = localStorage.getItem("text");
     alert("Sesión recuperada");
   }
 
@@ -275,6 +322,7 @@
 
   function saveSession() {
     sessionStorage.setItem("text", quill.root.innerHTML);
+    localStorage.setItem("text", quill.root.innerHTML);
     updateFormulaEditor();
   }
 
